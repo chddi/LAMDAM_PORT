@@ -37,15 +37,15 @@ a:focus-visible,button:focus-visible{outline:2px solid currentColor;outline-offs
 .nav ul a{font-family:var(--head);font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;opacity:.85;white-space:nowrap}
 .nav ul a:hover,.nav ul a[aria-current=page]{opacity:1;text-decoration:underline;text-underline-offset:4px}
 .has-sub{position:relative}
-.works{appearance:none;background:none;border:0;padding:0;margin:0;color:inherit;cursor:pointer;font-family:var(--head);font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;opacity:.85;white-space:nowrap}
-.works span{display:inline-block;font-size:.9em}
-.works:hover,.works.on,.has-sub.open .works{opacity:1}
-.works.on{text-decoration:underline;text-underline-offset:4px}
+.menu-btn{appearance:none;background:none;border:0;padding:0;margin:0;color:inherit;cursor:pointer;font-family:var(--head);font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;opacity:.85;white-space:nowrap}
+.menu-btn span{display:inline-block;font-size:.9em}
+.menu-btn:hover,.menu-btn.on,.has-sub.open .menu-btn{opacity:1}
+.menu-btn.on{text-decoration:underline;text-underline-offset:4px}
 .nav ul.sub{position:absolute;top:100%;left:-16px;display:none;flex-direction:column;gap:0;width:max-content;min-width:160px;margin:0;padding:17px 0 8px;background:var(--night);border:1px solid var(--bone-line);border-top:0}
 .nav ul.sub a{display:block;padding:9px 16px}
 .has-sub.open .sub{display:flex}
 @media (hover:hover){.has-sub:not(.shut):hover .sub{display:flex}}
-@media (max-width:760px){.nav{flex-wrap:wrap;gap:6px 16px}.nav>ul{width:100%;flex-wrap:wrap;gap:2px 12px}.nav>ul>li>a,.works{font-size:9.5px;letter-spacing:.05em}.nav ul.sub{padding-top:10px}.nav ul.sub a{font-size:11px;padding:11px 16px}}
+@media (max-width:760px){.nav{flex-wrap:wrap;gap:6px 16px}.nav>ul{width:100%;flex-wrap:wrap;gap:2px 12px}.nav>ul>li>a,.menu-btn{font-size:9.5px;letter-spacing:.05em}.nav ul.sub{padding-top:10px}.nav ul.sub a{font-size:11px;padding:11px 16px}}
 
 /* landing hero */
 .hero{position:relative;height:clamp(520px,84svh,920px);overflow:hidden;background:#000;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(20px,3vw,40px) var(--gut) 22px}
@@ -238,14 +238,21 @@ html.motion .lb-stage img{animation:lbin .45s ease}
   <ul>
     <li><a href="#top">Homepage</a></li>
     <li class="has-sub">
-      <button class="works" type="button" aria-expanded="false" aria-controls="works-menu">Works <span aria-hidden="true">↓</span></button>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="works-menu">Works <span aria-hidden="true">↓</span></button>
       <ul class="sub" id="works-menu">
         <li><a href="#ecommerce">E‑Commerce</a></li>
         <li><a href="#advertising">Advertising</a></li>
         <li><a href="#editorial">Editorial</a></li>
       </ul>
     </li>
-    <li><a href="#personal">Personal</a></li>
+    <li class="has-sub" data-page="personal">
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="personal-menu">Personal <span aria-hidden="true">↓</span></button>
+      <ul class="sub" id="personal-menu">
+        <li><a href="#p-travel">Travel</a></li>
+        <li><a href="#p-blonde">Blonde</a></li>
+        <li><a href="#p-colors-and-shapes">Colors and Shapes</a></li>
+      </ul>
+    </li>
     <li><a href="#about">About</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
@@ -296,10 +303,10 @@ const TOP_LAYOUT = [2, 2, 3, 3];
 const REST = [
   {title:'Dynamite', cat:'e', disc:'Apparel · Accessories', theme:'light', imgs:[...P('p05'),...P('p11')]},
   {title:'Garage', cat:'e', disc:'Apparel', theme:'light', imgs:[...P('p06'),...P('p12')]},
-  {title:'Rooney', cat:'e', disc:'Apparel · Footwear', theme:'light', imgs:[...P('p07'),...P('p13')]},
-  {title:'Bench', cat:'e', disc:'Outerwear · Kids', theme:'light', imgs:[...P('p08'),...P('p09')]},
   {title:'Brown Shoes', cat:'e', disc:'Footwear', theme:'light', imgs:H('brown',1,8)},
   {title:'Pas Pour Moi', cat:'e', disc:'Eyewear', theme:'light', imgs:H('ppmecom',1,8)},
+  {title:'Rooney', cat:'e', disc:'Apparel · Footwear', theme:'light', imgs:[...P('p07'),...P('p13')]},
+  {title:'Bench', cat:'e', disc:'Outerwear · Kids', theme:'light', imgs:[...P('p08'),...P('p09')]},
   {title:'Still Life Studies', cat:'e', disc:'Product · Still Life', theme:'dark', imgs:[...P('p14'),...P('p15')]},
 
   {title:'Pas Pour Moi Launch Campaign', cat:'a', disc:'Eyewear · Campaign', theme:'dark', imgs:H('ppmlaunch',1,8)},
@@ -650,18 +657,24 @@ function go(hash) {
     const on = a.getAttribute('href') === '#' + t || (proj && a.getAttribute('href') === '#' + CATS[proj.cat].id);
     if (on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
   });
-  worksBtn.classList.toggle('on', !!worksItem.querySelector('[aria-current]'));
+  menus.forEach(m => m.querySelector('.menu-btn').classList.toggle('on', !!(m.querySelector('[aria-current]') || (m.dataset.page && (m.dataset.page === t || (proj && CATS[proj.cat].id === m.dataset.page))))));
 }
-const worksItem = document.querySelector('.has-sub'), worksBtn = worksItem.querySelector('.works');
-function setWorks(open) { worksItem.classList.toggle('open', open); worksBtn.setAttribute('aria-expanded', open); }
-worksItem.addEventListener('mouseleave', () => worksItem.classList.remove('shut'));
-worksItem.addEventListener('focusout', e => { if (e.relatedTarget && !worksItem.contains(e.relatedTarget)) setWorks(false); });
-addEventListener('scroll', () => setWorks(false), {passive:true});
-addEventListener('keydown', e => { if (e.key === 'Escape' && worksItem.classList.contains('open')) { setWorks(false); worksBtn.focus(); } });
+const menus = [...document.querySelectorAll('.has-sub')];
+function setMenu(m, open) { m.classList.toggle('open', open); m.querySelector('.menu-btn').setAttribute('aria-expanded', open); }
+function closeMenus() { menus.forEach(m => setMenu(m, false)); }
+menus.forEach(m => {
+  m.addEventListener('mouseenter', () => menus.forEach(o => { if (o !== m) setMenu(o, false); }));
+  m.addEventListener('mouseleave', () => m.classList.remove('shut'));
+  m.addEventListener('focusout', e => { if (e.relatedTarget && !m.contains(e.relatedTarget)) setMenu(m, false); });
+});
+addEventListener('scroll', closeMenus, {passive:true});
+addEventListener('keydown', e => { const m = menus.find(x => x.classList.contains('open')); if (e.key === 'Escape' && m) { setMenu(m, false); m.querySelector('.menu-btn').focus(); } });
 document.addEventListener('click', e => {
-  if (e.target.closest('.works')) { setWorks(!worksItem.classList.contains('open')); return; }
-  if (!e.target.closest('.sub')) setWorks(false);
-  else { setWorks(false); worksItem.classList.add('shut'); }
+  const btn = e.target.closest('.menu-btn');
+  if (btn) { const m = btn.closest('.has-sub'), open = !m.classList.contains('open'); closeMenus(); setMenu(m, open); return; }
+  const sub = e.target.closest('.sub');
+  closeMenus();
+  if (sub) sub.closest('.has-sub').classList.add('shut');
   const a = e.target.closest('a[href^="#"]');
   if (a) { e.preventDefault(); const h = a.getAttribute('href'); try { history.pushState(null, '', h); } catch (_) {} route(h); return; }
   const f = e.target.closest('figure[data-i]');
